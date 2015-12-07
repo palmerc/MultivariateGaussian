@@ -1,0 +1,82 @@
+\documentclass[12pt, a4paper]{report}
+\usepackage{amsmath,amssymb,graphicx,caption}
+\author{Ole Marius Hoel Rindal}
+\title{Multivariate Gaussian Classifier}
+\begin{document}
+	\maketitle
+	
+	\section*{Bayes' Rule}
+	We can use the Bayes' rule to find an expression for the class with the highest probability
+	\begin{equation}
+		p(\omega_j|x) = \frac{p(x|\omega_j)P(\omega_j)}{p(x)}
+		\label{BayesRule}
+	\end{equation}
+	where the probability of being class $\omega_j$ given $x$ is equal to the probability of $x$ given $\omega_j$ times the prior probability of being class $\omega_j$. This whole thing is over the probability of $x$, but we're going to argue that we don't need that in a moment. The prior probability of $\omega_j$ or $P(\omega_j)$ could be defined differently for each class although in this case we will be assuming the classes are equally likely or $\frac{1}{\#_{classes}}$. 
+	\section*{Gaussian Density}
+	Any probability can be used to make $p(x|\omega_j)$, but we want to use the multivariate Gaussian density.
+	\begin{equation}
+		p(\vec{x}|\omega_j) = \frac{1}{\sqrt{(2\pi)^d|\Sigma_j|}}e^{-\frac{1}{2}(\vec{x}-\vec{\mu_j})^\intercal\Sigma_j^{-1}(\vec{x}-\vec{\mu_j})}
+	\end{equation}
+	
+	where, $\vec{\mu_j}$ is the mean vector for class $j$ for $d$ features. Giving, 
+	\begin{equation}
+		\vec{\mu_j} = \begin{bmatrix}
+			\mu_j^1\\\mu_j^2\\\vdots\\\mu_j^n
+		\end{bmatrix}
+	\end{equation}
+	And $\Sigma_j$ is the covariance matrix for class $j$ for $d$ features, $|\Sigma_j|$ is its determinant, and $\Sigma_j^{-1}$ is its inverse.
+	
+	\section*{The Discriminant Function}
+	From \eqref{BayesRule} we get the discriminant function 
+	\begin{equation}
+		g_j(x) = p(\omega_j|\vec{x}) = \frac{p(\vec{x}|\omega_j)P(\omega_j)}{p(x)}
+	\end{equation}
+	but we can ignore $p(x)$ since this is only a normalizing factor and simplify the discriminant function by tossing it out since it won't change which class has the highest probability which is all we care about.
+	\begin{equation}
+		g_j(x) = p(\vec{x}|\omega_j)P(\omega_j)
+	\end{equation}
+	
+	\section*{Our Discriminant Function}
+	Before presenting our combined Gaussian density and Bayes' rule discriminant function we will want to simplify using the knowledge that
+	\begin{equation}
+		\ln(N\cdot M) = \ln(N)+\ln(M)
+	\end{equation}
+	when applied to our simplified Bayes' rule classifier
+	\begin{align}
+		g_j(\vec{x}) &= \ln(p(\vec{x}|\omega_j)P(\omega_j)) \\
+		&= \ln(p(\vec{x}|\omega_j)) + \ln(P(\omega_j))
+	\end{align}
+	
+	Now we can use this newly acquired knowledge to eliminate the exponent yielding a simplified multivariate Gaussian Classifier
+	\begin{equation}
+		g_j(\vec{x}) = -\frac{1}{2}(\vec{x}-\vec{\mu_j})^\intercal\Sigma_j^{-1}(\vec{x}-\vec{\mu_j})-\frac{d}{2}\ln2\pi-\frac{1}{2}\ln|\Sigma_j| + \ln P(\omega_j)
+		\label{GaussianDiscriminantFunction}
+	\end{equation}
+	
+	\section*{Special Cases}
+	Equation \eqref{GaussianDiscriminantFunction} can sometimes be simplified given specific knowledge about the covariance matrices.
+	\subsection*{Case 1: $\Sigma_j=\sigma^2I$}
+	The features are uncorrelated (independent) and have the same variance. Recalling \eqref{GaussianDiscriminantFunction}	 we can discard everything that is common for all classes, so we get
+	\begin{equation}
+		g_j(x) = -\frac{||\vec{x}-\vec{\mu_j}||^2}{2\sigma^2} + \ln P(\omega_j)
+	\end{equation}
+	where, 
+	\begin{equation}
+		||\vec{x}-\vec{\mu_j}||^2 = (\vec{x}-\vec{\mu_j})^\intercal(\vec{x}-\vec{\mu_j})
+	\end{equation}
+	which is the Euclidian distance. This is known as a minimum distance classifier.
+	
+	\subsection*{Case 2: Common covariance matrix}
+	Again, recalling \eqref{GaussianDiscriminantFunction}, but instead of $\Sigma_j=\sigma^2I$ we have $\Sigma_j=\Sigma$.
+	Since the covariance matrices are equal we can reduce the discriminant function to
+	\begin{equation}
+		g_j(\vec{x}) = -\frac{1}{2}(\vec{x}-\vec{\mu_j})^\intercal\Sigma_j^{-1}(\vec{x}-\vec{\mu_j}) + \ln P(\omega_j)
+	\end{equation}
+	where,
+	\begin{equation}
+		(\vec{x}-\vec{\mu_j})^\intercal\Sigma_j^{-1}(\vec{x}-\vec{\mu_j})
+		\label{MahalanobisDistance}
+	\end{equation}
+	equation \eqref{MahalanobisDistance} is the Mahalanobis distance.
+	
+\end{document}
